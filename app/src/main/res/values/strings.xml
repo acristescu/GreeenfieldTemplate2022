@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">GreenfieldTemplate2022</string>
+    <string name="send_mail">Send mail</string>
+    <string name="email_subject">Here is an image I found on Flickr</string>
+</resources>
