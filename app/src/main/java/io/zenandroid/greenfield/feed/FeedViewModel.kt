@@ -1,9 +1,6 @@
 package io.zenandroid.greenfield.feed
 
-import androidx.compose.runtime.MonotonicFrameClock
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.cash.molecule.launchMolecule
@@ -19,23 +16,23 @@ class FeedViewModel(
 
     private val moleculeScope = CoroutineScope(viewModelScope.coroutineContext + Dispatchers.Main + ImmediateMonotonicFrameClock)
 
-    private val loading = mutableStateOf(false)
-    private val sortVisible = mutableStateOf(false)
-    private val searchText = mutableStateOf("")
-    private val tags = mutableStateOf<String?>(null)
-    private val sortCriterion = mutableStateOf(SortCriterion.PUBLISHED)
-    private val errorMessage = mutableStateOf<String?>(null)
+    private var loading by mutableStateOf(false)
+    private var sortVisible by mutableStateOf(false)
+    private var searchText by mutableStateOf("")
+    private var tags by mutableStateOf<String?>(null)
+    private var sortCriterion by mutableStateOf(SortCriterion.PUBLISHED)
+    private var errorMessage by mutableStateOf<String?>(null)
 
     val state = moleculeScope.launchMolecule {
         val images by loadImageListUseCase.flow.collectAsState(initial = emptyList())
         FeedState(
-            loading = loading.value,
+            loading = loading,
             images = images,
-            tags = tags.value,
-            searchText = searchText.value,
-            criterion = sortCriterion.value,
-            sortDialogVisible = sortVisible.value,
-            errorMessage = errorMessage.value,
+            tags = tags,
+            searchText = searchText,
+            criterion = sortCriterion,
+            sortDialogVisible = sortVisible,
+            errorMessage = errorMessage,
         )
     }
 
@@ -45,33 +42,33 @@ class FeedViewModel(
 
     private fun fetchImages(tags: String?) {
         viewModelScope.launch {
-            loading.value = true
-            loadImageListUseCase.fetchImages(tags, sortCriterion.value)
-            loading.value = false
+            loading = true
+            loadImageListUseCase.fetchImages(tags, sortCriterion)
+            loading = false
         }
     }
 
     fun onEvent(event: FeedAction) {
         when(event) {
-            is SearchTextChanged -> searchText.value = event.text
+            is SearchTextChanged -> searchText = event.text
             SearchComplete -> {
-                if(searchText.value.isNotBlank()) {
-                    fetchImages(searchText.value.replace("\\s+".toRegex(), ","))
-                    tags.value = searchText.value
+                if(searchText.isNotBlank()) {
+                    fetchImages(searchText.replace("\\s+".toRegex(), ","))
+                    tags = searchText
                 }
             }
-            ChangeFiltering -> sortVisible.value = true
-            DismissFilterDialog -> sortVisible.value = false
+            ChangeFiltering -> sortVisible = true
+            DismissFilterDialog -> sortVisible = false
             is FeedAction.SortCriterion -> {
-                if(event.newCriterion != sortCriterion.value) {
-                    fetchImages(searchText.value.replace("\\s+".toRegex(), ","))
+                if(event.newCriterion != sortCriterion) {
+                    fetchImages(searchText.replace("\\s+".toRegex(), ","))
                 }
-                sortVisible.value = false
-                sortCriterion.value = event.newCriterion
+                sortVisible = false
+                sortCriterion = event.newCriterion
             }
             is Browse, is Save, is Share -> { } // This is handled by the activity
-            is Error -> errorMessage.value = event.errorMessage
-            DismissError -> errorMessage.value = null
+            is Error -> errorMessage = event.errorMessage
+            DismissError -> errorMessage = null
         }
     }
 }
