@@ -6,7 +6,6 @@ data class FeedState(
     val loading: Boolean = true,
     val images: List<Image>? = null,
     val tags: String? = null,
-    val searchText: String = "",
     val criterion: SortCriterion = SortCriterion.PUBLISHED,
     val sortDialogVisible: Boolean = false,
     val errorMessage: String? = null

@@ -8,23 +8,21 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.widget.Toast
+import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.runtime.livedata.observeAsState
-import androidx.lifecycle.asLiveData
-import io.zenandroid.greenfield.ui.GreenfieldTemplate2022Theme
-import org.koin.androidx.viewmodel.ext.android.viewModel
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.lifecycleScope
 import coil.ImageLoader
 import coil.request.ImageRequest
 import coil.request.SuccessResult
 import io.zenandroid.greenfield.R
+import io.zenandroid.greenfield.rememberStateWithLifecycle
+import io.zenandroid.greenfield.ui.GreenfieldTemplate2022Theme
 import kotlinx.coroutines.launch
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import permissions.dispatcher.NeedsPermission
 import permissions.dispatcher.OnPermissionDenied
 import permissions.dispatcher.RuntimePermissions
-import androidx.activity.compose.setContent
-import io.zenandroid.greenfield.rememberStateWithLifecycle
 
 @RuntimePermissions
 class FeedActivity : AppCompatActivity() {

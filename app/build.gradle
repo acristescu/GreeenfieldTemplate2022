@@ -37,7 +37,7 @@ android {
         compose true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion compose_version
+        kotlinCompilerExtensionVersion compose_compiler_version
         kotlinCompilerVersion '1.6.10'
     }
 }
@@ -51,10 +51,8 @@ dependencies {
     implementation "androidx.compose.material:material:$compose_version"
     implementation "androidx.compose.ui:ui-tooling:$compose_version"
     implementation "androidx.compose.runtime:runtime-livedata:$compose_version"
-    implementation "androidx.activity:activity-compose:$compose_version"
-    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.5.0-rc02'
-
-    implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.4.1"
+    implementation "androidx.activity:activity-compose:1.5.0"
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.0-alpha01'
 
     implementation 'com.squareup.moshi:moshi-kotlin:1.11.0'
     implementation 'com.squareup.moshi:moshi-adapters:1.11.0'

@@ -42,7 +42,6 @@ fun FeedUI(state: FeedState, listener: (FeedAction) -> Unit) {
     Scaffold(topBar = {
         TopBar(
                 subtitle = state.tags,
-                searchText = state.searchText,
                 listener = listener
         )
     }) {
@@ -229,15 +228,20 @@ fun FeedItem(item: Image, listener: (FeedAction) -> Unit) {
 @Composable
 fun TopBar(
         subtitle: String?,
-        searchText: String,
         listener: (FeedAction) -> Unit
 ) {
     var searchBoxVisible by remember { mutableStateOf(false) }
     TopAppBar(
             title = {
                 if (searchBoxVisible) {
+                    //
+                    // Note: normally we'd hoist this state too to the main state object, but due
+                    // to a bug in molecule https://github.com/cashapp/molecule/issues/63
+                    // the text field cursor would behave weirdly if we did
+                    //
+                    var textValue by remember { mutableStateOf("") }
                     TextField(
-                            value = searchText,
+                            value = textValue,
                             placeholder = {
                                 Row {
                                     Icon(Icons.Filled.Search, "Search")
@@ -248,7 +252,7 @@ fun TopBar(
                             singleLine = true,
                             trailingIcon = {
                                 IconButton(onClick = {
-                                    listener(FeedAction.SearchTextChanged(""))
+                                    textValue = ""
                                     searchBoxVisible = false
                                 }) {
                                     Icon(Icons.Filled.Close, "Close")
@@ -267,10 +271,10 @@ fun TopBar(
                             modifier = Modifier
                                 .fillMaxWidth(1f)
                                 .padding(bottom = 4.dp),
-                            onValueChange = { listener(FeedAction.SearchTextChanged(it)) },
+                            onValueChange = { textValue = it },
                             keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Search),
                             keyboardActions = KeyboardActions(onSearch = {
-                                listener(FeedAction.SearchComplete)
+                                listener(FeedAction.SearchComplete(textValue))
                                 searchBoxVisible = false
                             }),
                     )

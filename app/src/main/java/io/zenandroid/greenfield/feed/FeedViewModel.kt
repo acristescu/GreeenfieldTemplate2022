@@ -3,18 +3,18 @@ package io.zenandroid.greenfield.feed
 import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import app.cash.molecule.AndroidUiDispatcher
 import app.cash.molecule.launchMolecule
 import io.zenandroid.greenfield.domain.LoadImageListUseCase
 import io.zenandroid.greenfield.feed.FeedAction.*
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class FeedViewModel(
         private val loadImageListUseCase: LoadImageListUseCase,
 ) : ViewModel() {
 
-    private val moleculeScope = CoroutineScope(viewModelScope.coroutineContext + Dispatchers.Main + ImmediateMonotonicFrameClock)
+    private val moleculeScope = CoroutineScope(viewModelScope.coroutineContext + AndroidUiDispatcher.Main)
 
     private var loading by mutableStateOf(false)
     private var sortVisible by mutableStateOf(false)
@@ -29,7 +29,6 @@ class FeedViewModel(
             loading = loading,
             images = images,
             tags = tags,
-            searchText = searchText,
             criterion = sortCriterion,
             sortDialogVisible = sortVisible,
             errorMessage = errorMessage,
@@ -50,9 +49,9 @@ class FeedViewModel(
 
     fun onEvent(event: FeedAction) {
         when(event) {
-            is SearchTextChanged -> searchText = event.text
-            SearchComplete -> {
-                if(searchText.isNotBlank()) {
+            is SearchComplete -> {
+                if(event.text.isNotBlank()) {
+                    searchText = event.text
                     fetchImages(searchText.replace("\\s+".toRegex(), ","))
                     tags = searchText
                 }
@@ -70,12 +69,5 @@ class FeedViewModel(
             is Error -> errorMessage = event.errorMessage
             DismissError -> errorMessage = null
         }
-    }
-}
-
-// Note: this is a workaround for https://github.com/cashapp/molecule/issues/63
-private object ImmediateMonotonicFrameClock : MonotonicFrameClock {
-    override suspend fun <R> withFrameNanos(onFrame: (frameTimeNanos: Long) -> R): R {
-        return onFrame(System.nanoTime())
     }
 }
