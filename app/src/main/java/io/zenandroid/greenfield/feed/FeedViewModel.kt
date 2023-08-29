@@ -4,6 +4,7 @@ import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.cash.molecule.AndroidUiDispatcher
+import app.cash.molecule.RecompositionMode.ContextClock
 import app.cash.molecule.launchMolecule
 import io.zenandroid.greenfield.domain.LoadImageListUseCase
 import io.zenandroid.greenfield.feed.FeedAction.*
@@ -23,7 +24,7 @@ class FeedViewModel(
     private var sortCriterion by mutableStateOf(SortCriterion.PUBLISHED)
     private var errorMessage by mutableStateOf<String?>(null)
 
-    val state = moleculeScope.launchMolecule {
+    val state = moleculeScope.launchMolecule(mode = ContextClock) {
         val images by loadImageListUseCase.flow.collectAsState(initial = emptyList())
         FeedState(
             loading = loading,
